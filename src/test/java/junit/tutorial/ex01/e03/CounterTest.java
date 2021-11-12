@@ -52,6 +52,7 @@ class CounterTest {
 		int expected = 2;
 		assertEquals(expected, actual, "期待値と実際の値が異なります");
 	}
+	
 	@Test
 	@DisplayName("incrementを50回実行した状態でincrementを実行すると51が取得できる")
 	void testCounter3() {
