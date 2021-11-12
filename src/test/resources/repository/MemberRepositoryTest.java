@@ -1,22 +1,38 @@
 package repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.sql.Connection;
 import java.util.List;
 
+import org.dbunit.database.DatabaseConfig;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.excel.XlsDataSet;
+import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import domain.Member;
 
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
 class MemberRepositoryTest {
-
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 	}
@@ -27,6 +43,23 @@ class MemberRepositoryTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
+		// DBコネクション取得
+		Connection conn = jdbcTemplate.getDataSource().getConnection();
+		IDatabaseConnection dbconn = new DatabaseConnection(conn);
+
+		DatabaseConfig config = dbconn.getConfig();
+//		config.setProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER, new PostgresqlMetadataHandler());
+		// new PostgresqlDataTypeFactory()
+		config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new PostgresqlDataTypeFactory());
+		// Excel用データセット作成
+		File f = new File(ClassLoader.getSystemResource("test_data.xlsx").getFile());
+		IDataSet dataset = new XlsDataSet(f);
+
+		// データの全削除
+		DatabaseOperation.DELETE_ALL.execute(dbconn, dataset);
+
+		// データの挿入
+		DatabaseOperation.INSERT.execute(dbconn, dataset);
 	}
 
 	@AfterEach
@@ -36,27 +69,16 @@ class MemberRepositoryTest {
 	@Test
 	@DisplayName("メンバー一覧の情報が一致している")
 	void testFindall() {
-		
-		List<Member> expectedList = new ArrayList();
-		Member member1 = new Member();
-		member1.setId(1);
-		member1.setName("hoge");
-		member1.setAge(19);
-		Member member2 = new Member();
-		member2.setId(2);
-		member2.setName("fuga");
-		member2.setAge(20);
-		Member member3 = new Member();
-		member3.setId(3);
-		member3.setName("piyo");
-		member3.setAge(21);
-		expectedList.set(0, member1);
-		expectedList.set(1, member2);
-		expectedList.set(2, member3);
 		MemberRepository memberRepository = new MemberRepository();
 		List<Member> actuList = memberRepository.findall();
-		
-		assertThat(expectedList, is(actuList));
+		assertEquals(3, actuList.size());
+		Member member2 = actuList.get(1);
+		Member member3 = actuList.get(2);
+		assertEquals("piyo", member3.getName(), "要素内の名前が違います");
+		assertEquals(20, member2.getAge(), "要素内の年齢が違います");
 	}
+
+	
+
 
 }

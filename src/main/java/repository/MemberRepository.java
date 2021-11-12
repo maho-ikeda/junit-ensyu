@@ -21,7 +21,6 @@ public class MemberRepository {
 		member.setName(rs.getString("name"));
 		member.setAge(rs.getInt("age"));
 		return member;
-		
 	};
 	
 	/**
@@ -32,9 +31,6 @@ public class MemberRepository {
 		String sql = "SELECT id, name, age FROM member ORDER BY id";
 		
 		List<Member> memberList = template.query(sql, ME_ROW_MAPPER);
-		if (memberList.size() == 0) {
-			return null;
-		}
 		return memberList;
 	}
 }
