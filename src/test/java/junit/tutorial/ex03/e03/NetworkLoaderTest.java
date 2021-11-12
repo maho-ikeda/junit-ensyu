@@ -1,10 +1,6 @@
-package junit.tutorial.ex03.e02;
+package junit.tutorial.ex03.e03;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.IOException;
-
-import javax.imageio.IIOException;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -12,8 +8,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-class LogAnalyzerTest {
+class NetworkLoaderTest {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -32,16 +29,9 @@ class LogAnalyzerTest {
 	}
 
 	@Test
-	@DisplayName("logLoaderのloadメソッドが呼び出された場合、IOExceptionを送出したならばAnalyzeExceptionが創出される")
-	void testAnalyze() {
-		LogAnalyzer logAnalyzer = new LogAnalyzer();
-		try {
-			logAnalyzer.analyze(null);
-			fail("例外が発生するはず");
-		} catch (AnalyzeException e) {
-			
-		}
-		
+	@DisplayName("")
+	void testGetInput() {
+		fail("Not yet implemented");
 	}
 
 }
